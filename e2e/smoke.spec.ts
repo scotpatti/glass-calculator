@@ -8,7 +8,20 @@ const key = (page: Page, name: string) =>
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
+  // The app renders just after the load event; wait until it is ready for input.
+  await expect(key(page, 'equals')).toBeVisible()
 })
+
+/** Waits for one-shot animations (panel entrance, result settle) to finish. */
+const animationsDone = (page: Page) =>
+  page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((animation) => animation.effect?.getComputedTiming().iterations !== Infinity)
+        .map((animation) => animation.finished),
+    ).then(() => undefined),
+  )
 
 test('a standard calculation by tapping keys', async ({ page }) => {
   for (const name of ['2', 'add', '3', 'multiply', '4']) await key(page, name).click()
@@ -122,6 +135,8 @@ test('no accessibility violations', async ({ page }) => {
   await key(page, '3').click()
   await key(page, 'equals').click()
   await page.getByRole('button', { name: 'History' }).click()
+  // Mid-animation the panel is partly transparent, which would skew contrast readings.
+  await animationsDone(page)
 
   const report = await new AxeBuilder({ page }).analyze()
   expect(report.violations.map((violation) => violation.id)).toEqual([])

@@ -33,7 +33,7 @@ As a user of any modern browser, I want the app to work the same, so that my bro
 **Acceptance criteria**
 
 - [ ] A Playwright suite runs a smoke scenario (a standard calculation, a scientific calculation, history reuse, theme toggle) in Chromium, Firefox, and WebKit.
-- [ ] The suite runs at one phone and one desktop viewport size.
+- [x] The suite runs at one phone and one desktop viewport size.
 - [ ] The glass fallback is checked visually in a browser with `backdrop-filter` disabled.
 - [ ] A manual pass on the current versions of Chrome, Safari, Firefox, and Edge is recorded in the README.
 
