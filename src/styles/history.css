@@ -1,0 +1,193 @@
+/*
+ * History panel. By default it overlays the keypad; on screens with room it
+ * sits beside the calculator instead.
+ */
+.history {
+  position: absolute;
+  z-index: 1;
+  top: calc(
+    var(--panel-padding) + var(--toolbar-height) + var(--display-height) + var(--space-2) * 2
+  );
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--glass-fill-overlay);
+  border-radius: var(--radius-inset) var(--radius-inset) var(--radius-panel) var(--radius-panel);
+  -webkit-backdrop-filter: blur(var(--blur-overlay)) saturate(var(--glass-saturation));
+  backdrop-filter: blur(var(--blur-overlay)) saturate(var(--glass-saturation));
+  animation: rise var(--duration-medium) var(--ease-out);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .history {
+    animation: none;
+  }
+}
+
+.history__header,
+.history__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target-min);
+}
+
+.history__title {
+  flex: 1;
+  margin: 0;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-strong);
+}
+
+.history__prompt {
+  flex: 1;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+}
+
+.history__empty {
+  align-self: center;
+  margin: 0;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.history__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-1);
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.history__entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--target-min);
+  grid-template-areas:
+    'expression remove'
+    'result remove';
+  align-items: center;
+  column-gap: var(--space-2);
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+  background: var(--key-fill);
+  border: var(--border-width) solid var(--key-border);
+  border-radius: var(--radius-key);
+}
+
+.history__button {
+  min-height: var(--target-min);
+  padding: 0 var(--space-1);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+  background: none;
+  border: 0;
+  border-radius: var(--space-2);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.history__button:hover {
+  background: var(--key-fill-hover);
+}
+
+.history__button--expression {
+  grid-area: expression;
+  font-size: var(--font-size-small);
+  color: var(--text-muted);
+}
+
+.history__button--result {
+  grid-area: result;
+  font-size: var(--font-size-key);
+  font-weight: var(--font-weight-strong);
+}
+
+.history__remove {
+  grid-area: remove;
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: var(--target-min);
+  height: var(--target-min);
+  padding: 0;
+  font-size: var(--font-size-key);
+  line-height: 1;
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.icon-button:hover {
+  background: var(--key-fill-hover);
+}
+
+@media (min-width: 780px) and (min-height: 501px) {
+  .stage[data-mode='standard'][data-history='open'] {
+    margin-right: calc(var(--history-width) + var(--space-4));
+  }
+
+  .stage[data-mode='standard'] .history {
+    top: 0;
+    left: calc(100% + var(--space-4));
+    right: auto;
+    width: var(--history-width);
+    background: var(--glass-fill);
+    border: var(--border-width) solid var(--glass-border);
+    border-radius: var(--radius-panel);
+    box-shadow:
+      0 24px 60px -18px var(--glass-shadow),
+      inset 1px 1px 0 var(--glass-highlight);
+    -webkit-backdrop-filter: blur(var(--blur-panel)) saturate(var(--glass-saturation));
+    backdrop-filter: blur(var(--blur-panel)) saturate(var(--glass-saturation));
+  }
+}
+
+@media (min-width: 1180px) and (min-height: 501px) {
+  .stage[data-mode='scientific'][data-history='open'] {
+    margin-right: calc(var(--history-width) + var(--space-4));
+  }
+
+  .stage[data-mode='scientific'] .history {
+    top: 0;
+    left: calc(100% + var(--space-4));
+    right: auto;
+    width: var(--history-width);
+    background: var(--glass-fill);
+    border: var(--border-width) solid var(--glass-border);
+    border-radius: var(--radius-panel);
+    box-shadow:
+      0 24px 60px -18px var(--glass-shadow),
+      inset 1px 1px 0 var(--glass-highlight);
+    -webkit-backdrop-filter: blur(var(--blur-panel)) saturate(var(--glass-saturation));
+    backdrop-filter: blur(var(--blur-panel)) saturate(var(--glass-saturation));
+  }
+}
+
+/* On a phone held sideways the panel covers the whole calculator. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .history {
+    top: 0;
+    border-radius: var(--radius-panel);
+  }
+}

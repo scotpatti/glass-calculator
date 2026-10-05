@@ -1,0 +1,144 @@
+/*
+ * Design tokens. Every visual value used by the component stylesheets lives here.
+ * Theme-dependent colors use light-dark(light, dark); the active side follows
+ * the system setting unless data-theme on <html> forces one.
+ */
+:root {
+  color-scheme: light dark;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --page-gutter: 16px;
+
+  /* Sizes */
+  --panel-width: 400px;
+  --panel-width-wide: 800px;
+  --panel-padding: 20px;
+  --history-width: 300px;
+  --toolbar-height: 44px;
+  --display-height: 136px;
+  --target-min: 44px;
+  --key-ratio: 1 / 0.8;
+
+  /* Shape */
+  --radius-panel: 32px;
+  --radius-inset: 22px;
+  --radius-key: 18px;
+  --radius-pill: 999px;
+  --border-width: 1px;
+  --focus-width: 3px;
+
+  /* Glass */
+  --blur-panel: 28px;
+  --blur-overlay: 40px;
+  --blur-blob: 70px;
+  --glass-saturation: 140%;
+
+  /* Type */
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-size-small: 0.8125rem;
+  --font-size-body: 1rem;
+  --font-size-key: 1.375rem;
+  --font-size-key-compact: 1rem;
+  --font-size-expression: 1.0625rem;
+  --font-size-result: 2.875rem;
+  --font-weight-normal: 450;
+  --font-weight-strong: 600;
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration-medium: 260ms;
+  --duration-shake: 360ms;
+  --duration-drift: 26s;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --press-scale: 0.95;
+
+  /* Background */
+  --bg-1: light-dark(#c9d6ff, #0b0a24);
+  --bg-2: light-dark(#e2c6ff, #1a1040);
+  --bg-3: light-dark(#ffd1e8, #2a0f3f);
+  --blob-1: light-dark(#8fa8ff, #5b2bd6);
+  --blob-2: light-dark(#ff9ecf, #b0206f);
+  --blob-3: light-dark(#7fe3e0, #1557c0);
+
+  /* Text */
+  --text: light-dark(#1b1340, #f5f3ff);
+  --text-muted: light-dark(#4a3f78, #cfc8f2);
+  --text-on-accent: #ffffff;
+  --text-danger: light-dark(#8f1239, #ffc2d4);
+
+  /* Surfaces */
+  --glass-fill: light-dark(rgb(255 255 255 / 0.32), rgb(22 18 48 / 0.42));
+  --glass-fill-inset: light-dark(rgb(255 255 255 / 0.3), rgb(8 6 24 / 0.36));
+  --glass-fill-overlay: light-dark(rgb(246 244 255 / 0.72), rgb(22 18 48 / 0.74));
+  --glass-fill-solid: light-dark(rgb(240 237 255 / 0.94), rgb(26 22 56 / 0.94));
+  --glass-border: light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.2));
+  --glass-highlight: light-dark(rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.3));
+  --glass-shadow: light-dark(rgb(49 30 110 / 0.28), rgb(0 0 0 / 0.55));
+
+  /* Keys */
+  --key-fill: light-dark(rgb(255 255 255 / 0.42), rgb(255 255 255 / 0.08));
+  --key-fill-function: light-dark(rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.15));
+  --key-fill-operator: light-dark(rgb(109 74 255 / 0.22), rgb(150 120 255 / 0.3));
+  --key-fill-hover: light-dark(rgb(255 255 255 / 0.3), rgb(255 255 255 / 0.12));
+  --key-fill-pressed: light-dark(rgb(27 19 64 / 0.14), rgb(0 0 0 / 0.3));
+  --key-border: light-dark(rgb(40 26 100 / 0.72), rgb(255 255 255 / 0.5));
+  --key-highlight: light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.16));
+  --accent-1: #6f4ef6;
+  --accent-2: #5236e0;
+  --accent-shadow: light-dark(rgb(82 54 224 / 0.45), rgb(111 78 246 / 0.5));
+
+  /* Focus: a two-tone ring stays visible on any backdrop */
+  --focus-ring: light-dark(#1b1340, #ffffff);
+  --focus-halo: light-dark(#ffffff, #0b0a24);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* Without backdrop blur, translucent panels would be hard to read: use the solid fill. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --glass-fill: var(--glass-fill-solid);
+    --glass-fill-overlay: var(--glass-fill-solid);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  :root {
+    --glass-fill: var(--glass-fill-solid);
+    --glass-fill-overlay: var(--glass-fill-solid);
+    --glass-border: light-dark(rgb(27 19 64 / 0.7), rgb(255 255 255 / 0.7));
+    --key-border: light-dark(rgb(27 19 64 / 0.85), rgb(255 255 255 / 0.85));
+    --blur-panel: 0px;
+    --blur-overlay: 0px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-medium: 0ms;
+    --duration-shake: 0ms;
+    --press-scale: 1;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  :root {
+    --page-gutter: 4px;
+    --panel-padding: 12px;
+    --display-height: 80px;
+    --font-size-result: 2rem;
+    --radius-panel: 24px;
+  }
+}

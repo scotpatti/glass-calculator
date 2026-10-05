@@ -1,0 +1,390 @@
+/* Stage: the calculator plus its history panel */
+.stage {
+  position: relative;
+  width: min(100%, var(--panel-width));
+  transition: margin var(--duration-medium) var(--ease-out);
+}
+
+.calculator {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'toolbar'
+    'display'
+    'memory'
+    'scientific'
+    'standard';
+  gap: var(--space-2);
+  padding: var(--panel-padding);
+}
+
+/* Toolbar */
+.toolbar {
+  grid-area: toolbar;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--toolbar-height);
+}
+
+.toolbar__spacer {
+  flex: 1;
+}
+
+.tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-width: var(--target-min);
+  height: var(--target-min);
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+  letter-spacing: 0.02em;
+  background: var(--key-fill-function);
+  border: var(--border-width) solid var(--key-border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color var(--duration-fast),
+    transform var(--duration-fast);
+}
+
+.tool:hover {
+  background-image: linear-gradient(var(--key-fill-hover), var(--key-fill-hover));
+}
+
+.tool:active {
+  transform: scale(var(--press-scale));
+}
+
+.tool[aria-pressed='true'],
+.tool[aria-expanded='true'] {
+  color: var(--text-on-accent);
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+}
+
+.tool svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Display */
+.display {
+  grid-area: display;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 22px 26px minmax(0, 1fr);
+  grid-template-areas:
+    'status'
+    'expression'
+    'result';
+  height: var(--display-height);
+  padding: var(--space-3) var(--space-4);
+  text-align: right;
+  background: var(--glass-fill-inset);
+  border: var(--border-width) solid var(--glass-border);
+  border-radius: var(--radius-inset);
+  box-shadow: inset 0 2px 10px -4px var(--glass-shadow);
+  overflow: hidden;
+}
+
+.display__status {
+  grid-area: status;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--space-2);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  background: var(--key-fill-function);
+  border: var(--border-width) solid var(--key-border);
+  border-radius: var(--radius-pill);
+}
+
+button.badge {
+  position: relative;
+  color: var(--text);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* Extends the hit area of the small badge button to the minimum target size. */
+button.badge::after {
+  content: '';
+  position: absolute;
+  inset: -11px -6px;
+}
+
+.display__expression {
+  grid-area: expression;
+  font-size: var(--font-size-expression);
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.display__expression::-webkit-scrollbar {
+  display: none;
+}
+
+.display__ghost {
+  opacity: 0.55;
+}
+
+.display__result {
+  grid-area: result;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  min-width: 0;
+  white-space: nowrap;
+  font-size: var(--font-size-result);
+  font-weight: var(--font-weight-strong);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.display__value {
+  display: inline-block;
+  font-size: calc(1em * var(--fit-scale, 1));
+  transform-origin: right bottom;
+}
+
+.display__value[data-kind='preview'] {
+  color: var(--text-muted);
+  font-weight: var(--font-weight-normal);
+}
+
+.display__value[data-kind='result'] {
+  animation: settle var(--duration-medium) var(--ease-out);
+}
+
+.display__value[data-kind='error'] {
+  color: var(--text-danger);
+}
+
+.display__probe {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.display[data-status='error'] {
+  animation: shake var(--duration-shake) ease-in-out;
+}
+
+@keyframes settle {
+  from {
+    opacity: 0.4;
+    transform: translateY(35%) scale(0.92);
+  }
+}
+
+@keyframes shake {
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .display__value[data-kind='result'],
+  .display[data-status='error'] {
+    animation: none;
+  }
+}
+
+/* Keypads */
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.keypad--memory {
+  grid-area: memory;
+}
+
+.keypad--scientific {
+  grid-area: scientific;
+}
+
+.keypad--standard {
+  grid-area: standard;
+}
+
+.key {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  aspect-ratio: var(--key-ratio);
+  padding: 0;
+  font-size: var(--font-size-key);
+  font-weight: var(--font-weight-normal);
+  font-variant-numeric: tabular-nums;
+  background: var(--key-fill);
+  border: var(--border-width) solid var(--key-border);
+  border-radius: var(--radius-key);
+  box-shadow: inset 1px 1px 0 var(--key-highlight);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast),
+    filter var(--duration-fast);
+}
+
+.key--function,
+.key--memory,
+.key--scientific {
+  background-color: var(--key-fill-function);
+}
+
+.key--operator {
+  background-color: var(--key-fill-operator);
+  font-weight: var(--font-weight-strong);
+}
+
+.key--equals {
+  color: var(--text-on-accent);
+  font-weight: var(--font-weight-strong);
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  border-color: var(--glass-border);
+  box-shadow:
+    0 10px 24px -8px var(--accent-shadow),
+    inset 1px 1px 0 var(--glass-highlight);
+}
+
+.key--memory,
+.key--scientific {
+  aspect-ratio: auto;
+  height: var(--target-min);
+  font-size: var(--font-size-key-compact);
+  font-weight: var(--font-weight-strong);
+}
+
+.key:hover {
+  background-image: linear-gradient(var(--key-fill-hover), var(--key-fill-hover));
+}
+
+.key--equals:hover {
+  background-image: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  filter: brightness(1.12);
+}
+
+.key:active,
+.key[data-pressed='true'] {
+  transform: scale(var(--press-scale));
+  background-image: linear-gradient(var(--key-fill-pressed), var(--key-fill-pressed));
+}
+
+.key--equals:active,
+.key--equals[data-pressed='true'] {
+  background-image: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  filter: brightness(0.86);
+}
+
+/* Scientific mode on a wide screen: function keys sit beside the standard keypad. */
+@media (min-width: 860px) and (min-height: 501px) {
+  .stage[data-mode='scientific'] {
+    width: min(100%, var(--panel-width-wide));
+  }
+
+  .stage[data-mode='scientific'] .calculator {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto auto auto 1fr;
+    grid-template-areas:
+      'toolbar toolbar'
+      'display display'
+      'memory standard'
+      'scientific standard';
+    column-gap: var(--space-4);
+  }
+
+  .stage[data-mode='scientific'] .keypad--scientific {
+    grid-auto-rows: 1fr;
+  }
+
+  .stage[data-mode='scientific'] .key--scientific {
+    height: auto;
+  }
+}
+
+/* A phone on its side: two columns, so the whole calculator fits without scrolling. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .stage,
+  .stage[data-mode='scientific'] {
+    width: min(100%, 720px);
+  }
+
+  .calculator {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      'toolbar standard'
+      'display standard'
+      'memory standard';
+    column-gap: var(--space-3);
+    align-items: start;
+  }
+
+  .stage[data-mode='scientific'] .calculator {
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      'toolbar display'
+      'memory standard'
+      'scientific standard';
+  }
+
+  .stage[data-mode='scientific'] .toolbar {
+    align-self: center;
+  }
+
+  /* Status and expression share a line to save height. */
+  .display {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: 22px minmax(0, 1fr);
+    grid-template-areas:
+      'status expression'
+      'result result';
+    column-gap: var(--space-3);
+    padding-block: var(--space-2);
+  }
+
+  .key {
+    aspect-ratio: auto;
+    height: var(--target-min);
+  }
+}
